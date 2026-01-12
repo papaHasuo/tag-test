@@ -1,0 +1,41 @@
+name: Deploy (manual tag)
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to deploy (e.g., v1.1.1)'
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout selected tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.tag }}
+
+      - name: Show version info
+        shell: bash
+        run: |
+          echo "Deploying tag: ${{ github.event.inputs.tag }}"
+          cat VERSION.txt || true
+          echo
+          echo "Commit: $(git rev-parse --short HEAD)"
+          echo "Date: $(date -u +"%Y-%m-%dT%H:%M:%SZ")"
+
+      - name: Simulate deploy
+        shell: bash
+        run: |
+          echo "Simulating deploy for tag ${{ github.event.inputs.tag }}"
+          echo "(Replace with real steps: build, test, release, etc.)"
+
+      - name: Write success summary
+        shell: bash
+        run: |
+          echo "## ✅ Deployment simulated" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tag: ${{ github.event.inputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Commit: $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Time (UTC): $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Status: Success" >> "$GITHUB_STEP_SUMMARY"

@@ -1,5 +1,10 @@
 # Changelog
 
+## v1.2.2
+- Additional hotfix: Fixed dashboard rendering issues
+- Improved session timeout handling
+- Enhanced security validations
+
 ## v1.2.1
 - Hotfix: Fixed critical authentication bug causing login failures
 - Improved error handling in dashboard

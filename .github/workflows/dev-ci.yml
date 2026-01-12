@@ -1,0 +1,36 @@
+name: Dev CI (non-prod)
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ci:
+    name: Build & Test (dev)
+    runs-on: ubuntu-latest
+    environment: development
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node (example)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Install deps
+        run: |
+          echo "Install dependencies here (e.g., npm ci)"
+
+      - name: Run tests
+        run: |
+          echo "Run unit/integration tests here (e.g., npm test)"
+
+      - name: Dev deploy (optional)
+        run: |
+          echo "Optional: deploy to dev/staging environment"
+          echo "This is separate from production, and does NOT use main nor tags."

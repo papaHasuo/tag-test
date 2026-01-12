@@ -1,0 +1,32 @@
+name: Production Release Deploy (tag)
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  deploy:
+    name: Deploy production from tag
+    runs-on: ubuntu-latest
+    environment: production
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout release tag
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Show version info
+        run: |
+          echo "Release tag: ${{ github.event.release.tag_name }}"
+          cat VERSION.txt || true
+
+      - name: Build (placeholder)
+        run: |
+          echo "Run build steps (npm/yarn/mvn/gradle/etc.)"
+
+      - name: Deploy to production (placeholder)
+        run: |
+          echo "Run production deploy (e.g., terraform/helm/SSH/API)"
+          echo "This runs only when a GitHub Release is published."

@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.2.1
+- Hotfix for v1.2.0 issues
+- Fix authentication login failure
+- Improve error handling in dashboard
+- Note: v1.2.0 was reverted due to critical bug
+
 ## v1.2.0
 - Added authentication module
 - Implemented new dashboard UI

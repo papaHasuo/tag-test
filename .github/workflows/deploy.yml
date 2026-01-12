@@ -4,22 +4,58 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag to deploy (e.g., v1.1.1)'
-        required: true
+        description: 'Tag to deploy (leave empty for latest tag)'
+        required: false
+        default: ''
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Show available tags
+        shell: bash
+        run: |
+          echo "Available tags (latest 10):"
+          git tag -l --sort=-v:refname | head -10
+
+      - name: Determine tag to deploy
+        id: determine-tag
+        shell: bash
+        run: |
+          INPUT_TAG="${{ github.event.inputs.tag }}"
+          if [ -z "$INPUT_TAG" ]; then
+            LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+            if [ -z "$LATEST_TAG" ]; then
+              echo "Error: No tags found in repository"
+              exit 1
+            fi
+            echo "Using latest tag: $LATEST_TAG"
+            echo "tag=$LATEST_TAG" >> "$GITHUB_OUTPUT"
+          else
+            if ! git rev-parse "refs/tags/$INPUT_TAG" >/dev/null 2>&1; then
+              echo "Error: Tag '$INPUT_TAG' does not exist"
+              echo "Available tags:"
+              git tag -l | tail -10
+              exit 1
+            fi
+            echo "Using specified tag: $INPUT_TAG"
+            echo "tag=$INPUT_TAG" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Checkout selected tag
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.inputs.tag }}
+          ref: ${{ steps.determine-tag.outputs.tag }}
 
       - name: Show version info
         shell: bash
         run: |
-          echo "Deploying tag: ${{ github.event.inputs.tag }}"
+          echo "Deploying tag: ${{ steps.determine-tag.outputs.tag }}"
           cat VERSION.txt || true
           echo
           echo "Commit: $(git rev-parse --short HEAD)"
@@ -28,14 +64,14 @@ jobs:
       - name: Simulate deploy
         shell: bash
         run: |
-          echo "Simulating deploy for tag ${{ github.event.inputs.tag }}"
+          echo "Simulating deploy for tag ${{ steps.determine-tag.outputs.tag }}"
           echo "(Replace with real steps: build, test, release, etc.)"
 
       - name: Write success summary
         shell: bash
         run: |
           echo "## ✅ Deployment simulated" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Tag: ${{ github.event.inputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Tag: ${{ steps.determine-tag.outputs.tag }}" >> "$GITHUB_STEP_SUMMARY"
           echo "- Commit: $(git rev-parse --short HEAD)" >> "$GITHUB_STEP_SUMMARY"
           echo "- Time (UTC): $(date -u +"%Y-%m-%dT%H:%M:%SZ")" >> "$GITHUB_STEP_SUMMARY"
           echo "- Status: Success" >> "$GITHUB_STEP_SUMMARY"

@@ -1,6 +1,11 @@
 # Changelog
 
-## v1.2.0
+## v1.2.1
+- Hotfix: Fixed critical authentication bug causing login failures
+- Improved error handling in dashboard
+- Stabilized API performance
+
+## v1.2.0 (REVERTED)
 - Added authentication module
 - Implemented new dashboard UI
 - Enhanced API performance by 30%
